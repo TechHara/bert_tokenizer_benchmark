@@ -11,6 +11,7 @@ def main():
     parser.add_argument('--method', type=str, choices=['hf', 'tf', 'bf'])
     parser.add_argument('--input', type=str, default=None)
     parser.add_argument('--dataset', type=str, choices=['wikitext'])
+    parser.add_argument('-n', type=int, default=1000000)
 
     args = parser.parse_args()
     if not ((args.input is None) ^ (args.dataset is None)):
@@ -38,9 +39,11 @@ def main():
     else: #args.dataset is not None
         if args.dataset == 'wikitext':
             dataset = load_dataset('wikitext', 'wikitext-103-raw-v1')['train']
-        for text in dataset:
+        for n,text in enumerate(dataset):
             line = text['text']
             print(' '.join(str(idx) for idx in tokenize(line)))
+            if args.n is not None and n >= args.n:
+                break
 
     
 
