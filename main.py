@@ -7,7 +7,7 @@ import tensorflow_text as tf_text
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--method', type=str, choices=['hfbt', 'hfbtf', 'tfbtf'])
+    parser.add_argument('--method', type=str, choices=['hf', 'tf'])
     parser.add_argument('--input', type=str, default=None)
     parser.add_argument('--dataset', type=str, choices=['wikitext'])
 
@@ -16,15 +16,13 @@ def main():
         print('one of --input or --dataset must be provided')
         exit(-1)
 
-    if args.method.startswith('hf'):
-        Tokenizer = BertTokenizer if args.method == 'hfbt' else BertTokenizerFast
-        tokenizer = Tokenizer.from_pretrained('bert-base-uncased')
+    if args.method == 'hf':
+        tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
         tokenize = lambda s: tokenizer([s]).input_ids[0][1:-1]
-    elif args.method.startswith('tf'):
+    elif args.method == 'tf':
         vocab = []
         with open('vocab.txt') as f:
-            for line in f:
-                vocab.append(line.strip())
+            vocab = f.read().split()
         tokenizer = tf_text.FastBertTokenizer(vocab, lower_case_nfd_strip_accents=True, )
         tokenize = lambda s: tokenizer.tokenize([s]).numpy()[0]
 
